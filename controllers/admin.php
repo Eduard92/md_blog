@@ -86,6 +86,12 @@ class Admin extends Admin_Controller
 		$this->lang->load(array('blog', 'categories'));
 
 		$this->load->library(array('keywords/keywords', 'form_validation'));
+		$this->load->library('FacebookSDK');
+
+		$this->load->library(array('keywords/keywords', 'form_validation'));
+		
+		$this->config->load('files/files');
+		$this->load->library('files/files');
 
 		$_categories = array();
 		if ($categories = $this->blog_categories_m->order_by('title')->get_all())
