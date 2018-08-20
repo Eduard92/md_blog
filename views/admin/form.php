@@ -146,6 +146,13 @@
     						</div>
     					</div>
     				<?php endif; ?>
+                    
+                    <div class="form-group">
+                        <label>Publicar en Facebook                           
+                           <input type="checkbox" value="1" name="facebook" <?=$post->facebook?'checked':''?> />
+                        </label>
+                                                       
+                   </div>
     			
     		</fieldset>
         </uib-tab>

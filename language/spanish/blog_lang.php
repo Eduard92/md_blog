@@ -66,3 +66,7 @@ $lang['blog:twitter_error'] 				= 'Error de Twitter';
 $lang['blog:archive_date_format']			= "%B %Y";
 
 /* End of file blog:lang.php */
+
+$lang['blog:edit_success_facebook'] 		= 'El artículo "%s" fue actualizado <br /> Se publico el articulo en Facebook.';
+$lang['blog:post_add_success_facebook'] 	= 'El artículo "%s" fue agregado. <br /> Se publico el articulo en Facebook.';
+$lang['blog:post_error_facebook'] 			= 'Ocurrio un problema al intentar publicar en Facebook.';

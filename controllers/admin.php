@@ -236,6 +236,20 @@ class Admin extends Admin_Controller
 				{
 					// Fire an event, we're posting a new blog!
 					Events::trigger('post_published', $id);
+
+					if($this->input->post('facebook') == 1)
+					{
+						 $Facebook = $this->photo_facebook($id);
+
+						 if($Facebook == true){
+
+							$this->session->set_flashdata(array('success' => sprintf(lang('blog:post_add_success_facebook'), $this->input->post('title'))));
+						}
+						else{
+						 	$this->session->set_flashdata(array('error' => sprintf(lang('blog:edit_error_facebook'), $this->input->post('title'))));
+						 }
+
+					}
 				}
 			}
 			else
@@ -382,6 +396,32 @@ class Admin extends Admin_Controller
 				{
 					// Fire an event, we're posting a new blog!
 					Events::trigger('post_published', $id);
+					if($this->input->post('facebook') == 1)
+					{
+						 $Facebook = $this->photo_facebook($id);
+
+						 if($Facebook == true)
+						 {
+						 	$this->session->set_flashdata(array('success' => sprintf(lang('blog:edit_success_facebook'), $this->input->post('title'))));
+						 }
+						 else{
+						 	$this->session->set_flashdata(array('error' => sprintf(lang('blog:edit_error_facebook'), $this->input->post('title'))));
+						 }
+					}		
+	
+				}
+				elseif((empty($post->facebook) == true && $this->input->post('facebook') == 1 ) && $post->status == 'live')
+				{
+					 $Facebook = $this->photo_facebook($id);
+
+					 if($Facebook == true){
+
+					  $this->session->set_flashdata(array('success' => sprintf(lang('blog:edit_success_facebook'), $this->input->post('title'))));
+					}
+					else{
+						 	$this->session->set_flashdata(array('error' => sprintf(lang('blog:edit_error_facebook'), $this->input->post('title'))));
+						 }
+
 				}
 			}
 			else
@@ -611,5 +651,75 @@ class Admin extends Admin_Controller
 	private function _preview_hash()
 	{
 		return md5(microtime() + mt_rand(0, 1000));
+	}
+
+	private function photo_facebook($id = '')
+	{
+
+		$post = $this->blog_m->get($id);
+
+		if ($post->facebook == null)
+		{
+				$file =  $this->file_m->get_by('id', $post->portada);
+
+
+				$url = shorten_url(site_url('blog/'.date('Y/m', $post->created_on).'/'.$post->slug));
+
+					$fb = new Facebook\Facebook(array(
+				  				 'app_id'  => '707670929568625', //App id
+				 				 'app_secret' => '6c499840f5e04e6b7fbe4c37ec24b94f',
+				   				 'default_graph_version' => 'v2.4'
+						));
+						
+					try {
+				 			$accessToken = '{{token_pagina}}';	//acces tpken pagina
+
+				 			if ($post->title != $post->intro){
+								$linkData = ['caption' => $post->title.' 
+
+										 '.
+									substr($post->intro, 0, 150).'...
+									Ver mas -->'.$url,
+									'url' => site_url(substr($file->path, 14)),
+								];
+						    }
+						    elseif ($post->title == $post->intro){
+								$linkData = ['caption' => $post->title.'
+									Ver mas -->'.$url,
+									'url' => site_url(substr($file->path, 14)),
+								];
+						    }
+							
+							  $response = $fb->post(
+								    '/{{id_page}}/photos', $linkData,///poner id de pagina
+								      $accessToken
+								  );
+						
+						} catch (Facebook\Exceptions\FacebookResponseException $e) {
+							// When Graph returns an error
+							echo 'Graph returned an error: ' . $e->getMessage();
+							 exit;
+						} catch (Facebook\Exceptions\FacebookSDKException $e) {
+						// When validation fails or other local issues
+							 exit;			
+						}
+
+						$graphNode = $response->getGraphNode();
+
+
+					if ($graphNode['id'])
+						{
+						$this->blog_m->update($id,array('facebook' => 1, ));
+
+							return true;
+						}
+		}
+		else
+		{
+			return false;
+		}
+
+
+						
 	}
 }
